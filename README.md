@@ -11,7 +11,7 @@
 ```json
 {
   "require": {
-    "indeximstudio/multichat-sdk": "^1.0"
+    "indeximstudio/multichat-api-sdk": "^1.0"
   }
 }
 ```
