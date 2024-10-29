@@ -1,6 +1,6 @@
 <?php
 
-namespace Indeximstudio;
+namespace Indeximstudio\MultiChat;
 
 use Exception;
 use GuzzleHttp\Client;
