@@ -56,9 +56,10 @@ class MultiChat
      *    'baseUrl' => 'MultiChat uri'
      * ],
      * @param  string  $pageUniqueCode
-     * @param  string  $email
-     * @param  string  $name
+     * @param  string  $customerEmail
+     * @param  string  $customerName
      * @param  string  $mangerEmail
+     * @param  string  $mangerName
      * @param  string  $version
      *
      * @return \Indeximstudio\MultiChat\MultiChat
@@ -186,7 +187,7 @@ class MultiChat
         $client = new Client();
         $response = $client->request(
             'GET',
-            $this->getBaseUrl()."/api/{$this->getVersion()}/customers/email/{$email}/{$type}", [
+            $this->getBaseUrl()."/api/{$this->getVersion()}/customers/email/$email/$type", [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->getToken(),
             ]
@@ -316,7 +317,14 @@ class MultiChat
         $this->version = $version;
     }
 
-    private function setCustomer(string $customerEmail, string $customerName,): void
+    /**
+     * @param  string  $customerEmail
+     * @param  string  $customerName
+     *
+     * @return void
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    private function setCustomer(string $customerEmail, string $customerName): void
     {
         $this->customer = $this->getChatReader($customerEmail);
         if (empty($this->customer)) {
@@ -324,7 +332,14 @@ class MultiChat
         }
     }
 
-    private function setManager(string $mangerEmail = '', string $mangerName = '',): void
+    /**
+     * @param  string  $mangerEmail
+     * @param  string  $mangerName
+     *
+     * @return void
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    private function setManager(string $mangerEmail = '', string $mangerName = ''): void
     {
         $this->manager = $this->getChatReader(
             $mangerEmail,
