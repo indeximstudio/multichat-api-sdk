@@ -67,13 +67,13 @@ class MultiChat
      * @throws \Exception
      */
     public static function multiChat(
-            array  $config,
-            string $pageUniqueCode,
-            string $customerEmail,
-            string $customerName,
-            string $mangerEmail = '',
-            string $mangerName = '',
-            string $version = 'v1'
+        array  $config,
+        string $pageUniqueCode,
+        string $customerEmail,
+        string $customerName,
+        string $mangerEmail = '',
+        string $mangerName = '',
+        string $version = 'v1'
     ): MultiChat {
         $multiChat = new self($config, $pageUniqueCode, $version);
         if (!empty($customerEmail)) {
@@ -150,9 +150,9 @@ class MultiChat
             'POST',
             $this->getBaseUrl()."/api/{$this->getVersion()}/customers/", [
             'headers' => [
-                    'Authorization' => 'Bearer ' . $this->getToken(),
-                    'Accept'        => 'application/json',
-                    'Content-Type'  => 'application/json',
+                'Authorization' => 'Bearer ' . $this->getToken(),
+                'Accept'        => 'application/json',
+                'Content-Type'  => 'application/json',
             ],
             'json'    => [
                 'name'      => $name,
@@ -214,12 +214,12 @@ class MultiChat
         $client = new Client();
 
         $response = $client->request(
-                'GET',
-                $this->getBaseUrl()."/api/{$this->getVersion()}/chats/page_unique_code/{$this->getPageUniqueCode()}", [
-                'headers' => [
-                        'Authorization' => 'Bearer '.$this->getToken(),
-                ],
-                'timeout' => 10,
+            'GET',
+            $this->getBaseUrl()."/api/{$this->getVersion()}/chats/page_unique_code/{$this->getPageUniqueCode()}", [
+            'headers' => [
+                'Authorization' => 'Bearer '.$this->getToken(),
+            ],
+            'timeout' => 10,
         ]);
 
         if ($response->getStatusCode() != 200) {
@@ -246,20 +246,20 @@ class MultiChat
         $client = new Client();
 
         $data = [
-                'page_unique_code' => $this->getPageUniqueCode(),
-                'email'            => $email,
+            'page_unique_code' => $this->getPageUniqueCode(),
+            'email'            => $email,
         ];
 
         $response = $client->request(
-                'POST',
-                $this->getBaseUrl()."/api/{$this->getVersion()}/chats/", [
-                'headers' => [
-                        'Authorization' => 'Bearer '.$this->getToken(),
-                        'Accept'        => 'application/json',
-                        'Content-Type'  => 'application/json',
-                ],
-                'json'    => $data,
-                'timeout' => 10,
+            'POST',
+            $this->getBaseUrl()."/api/{$this->getVersion()}/chats/", [
+            'headers' => [
+                'Authorization' => 'Bearer '.$this->getToken(),
+                'Accept'        => 'application/json',
+                'Content-Type'  => 'application/json',
+            ],
+            'json'    => $data,
+            'timeout' => 10,
         ]);
 
         if ($response->getStatusCode() != 200) {
@@ -284,8 +284,16 @@ class MultiChat
             throw new Exception("empty link");
         }
         $url = $this->chat['link'] ?? '';
+        if (empty($url)) {
+            return '';
+        }
+        if (!empty($this->customer)) {
+            $readerId = $this->customer['id'];
+        } else {
+            $readerId = $this->manager['id'];
+        }
 
-        return ! empty($url) ? $url.'/'.$this->customer['id'] : '';
+        return $url . '/' . $readerId;
     }
 
     public function getPageUniqueCode(): string
