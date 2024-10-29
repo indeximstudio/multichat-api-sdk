@@ -287,10 +287,10 @@ class MultiChat
         if (empty($url)) {
             return '';
         }
-        if (!empty($this->customer)) {
-            $readerId = $this->customer['id'];
-        } else {
+        if (!empty($this->manager)) {
             $readerId = $this->manager['id'];
+        } else {
+            $readerId = $this->customer['id'];
         }
 
         return $url . '/' . $readerId;
