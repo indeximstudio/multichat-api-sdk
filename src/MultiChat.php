@@ -11,6 +11,7 @@ class MultiChat
     private string $baseUrl = '';
     private array $chat;
     private array $customer;
+    private array $manager;
     private string $pageUniqueCode;
     private string $version;
 
@@ -50,36 +51,39 @@ class MultiChat
 
     /**
      * @param  array  $config
+     * $config = [
+     *    'token' => '',
+     *    'baseUrl' => 'MultiChat uri'
+     * ],
      * @param  string  $pageUniqueCode
      * @param  string  $email
      * @param  string  $name
      * @param  string  $mangerEmail
      * @param  string  $version
      *
-     * @return \Indeximstudio\src\MultiChat
+     * @return \Indeximstudio\MultiChat\MultiChat
+     *
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Exception
      */
-    public static function MultiChat(
-            array $config,
-            string  $pageUniqueCode,
-            string $email,
-            string $name,
+    public static function multiChat(
+            array  $config,
+            string $pageUniqueCode,
+            string $customerEmail,
+            string $customerName,
             string $mangerEmail = '',
+            string $mangerName = '',
             string $version = 'v1'
     ): MultiChat {
-        $multiChat = new MultiChat($config, $pageUniqueCode, $version);
-
-        if (empty($multiChat->customer($email))) {
-            $multiChat->createCustomer($email, $name);
+        $multiChat = new self($config, $pageUniqueCode, $version);
+        if (!empty($customerEmail)) {
+            $multiChat->setCustomer($customerEmail, $customerName);
         }
-
         if (empty($multiChat->chat())) {
-            $multiChat->createChat($email);
+            $multiChat->createChat($customerEmail);
         }
-
         if (!empty($mangerEmail)){
-            // todo получаем менеджера
+            $multiChat->setManager($mangerEmail, $mangerName);
         }
 
         return $multiChat;
@@ -128,41 +132,42 @@ class MultiChat
      * @param  string  $email
      * @param  string  $name
      * @param  string  $type
-     * @param $timeout
+     * @param int      $timeout
      *
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Exception
      */
-    public function createCustomer(string $email, string $name, string $type = 'BUYER', $timeout = 10): array
+    public function createChatReader(
+        string $email,
+        string $name,
+        string $type = 'BUYER',
+        int    $timeout = 10
+    ): array
     {
         $client = new Client();
-
-        $data = [
+        $response = $client->request(
+            'POST',
+            $this->getBaseUrl()."/api/{$this->getVersion()}/customers/", [
+            'headers' => [
+                    'Authorization' => 'Bearer ' . $this->getToken(),
+                    'Accept'        => 'application/json',
+                    'Content-Type'  => 'application/json',
+            ],
+            'json'    => [
                 'name'      => $name,
                 'email'     => $email,
                 'type_name' => $type,
-        ];
-
-        $response = $client->request(
-                'POST',
-                $this->getBaseUrl()."/api/{$this->getVersion()}/customers/", [
-                'headers' => [
-                        'Authorization' => 'Bearer '.$this->getToken(),
-                        'Accept'        => 'application/json',
-                        'Content-Type'  => 'application/json',
-                ],
-                'json'    => $data,
-                'timeout' => $timeout,
+            ],
+            'timeout' => $timeout
         ]);
-
         if ($response->getStatusCode() != 200) {
-            throw new Exception("bad response");
+            throw new Exception("Bad response");
         }
         $body          = $response->getBody()->getContents();
         $responseArray = json_decode($body, true);
         if ($responseArray['success'] === true) {
-            return $this->customer = $responseArray['data'];
+            return $responseArray['data'];
         }
 
         return [];
@@ -176,25 +181,23 @@ class MultiChat
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Exception
      */
-    public function customer(string $email, string $type = 'BUYER'): array
+    public function getChatReader(string $email, string $type = 'BUYER'): array
     {
         $client = new Client();
-
         $response = $client->request(
-                'GET',
-                $this->getBaseUrl()."/api/{$this->getVersion()}/customers/email/{$email}/{$type}", [
-                'headers' => [
-                        'Authorization' => 'Bearer '.$this->getToken(),
-                ],
+            'GET',
+            $this->getBaseUrl()."/api/{$this->getVersion()}/customers/email/{$email}/{$type}", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->getToken(),
+            ]
         ]);
-
         if ($response->getStatusCode() != 200) {
-            throw new Exception("bad response");
+            throw new Exception("Bad response");
         }
         $body          = $response->getBody()->getContents();
         $responseArray = json_decode($body, true);
         if ($responseArray['success'] === true) {
-            return $this->customer = $responseArray['data'];
+            return $responseArray['data'];
         }
 
         return [];
@@ -303,5 +306,28 @@ class MultiChat
     public function setVersion(string $version): void
     {
         $this->version = $version;
+    }
+
+    private function setCustomer(string $customerEmail, string $customerName,): void
+    {
+        $this->customer = $this->getChatReader($customerEmail);
+        if (empty($this->customer)) {
+            $this->customer = $this->createChatReader($customerEmail, $customerName);
+        }
+    }
+
+    private function setManager(string $mangerEmail = '', string $mangerName = '',): void
+    {
+        $this->manager = $this->getChatReader(
+            $mangerEmail,
+            'MANAGER'
+        );
+        if (empty($this->manager)) {
+            $this->manager = $this->createChatReader(
+                $mangerEmail,
+                $mangerName,
+                'MANAGER'
+            );
+        }
     }
 }
