@@ -1,6 +1,6 @@
 <?php
 
-namespace Indeximstudio\src;
+namespace Indeximstudio;
 
 use Exception;
 use GuzzleHttp\Client;
