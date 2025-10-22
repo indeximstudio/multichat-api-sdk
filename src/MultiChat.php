@@ -14,16 +14,23 @@ class MultiChat
     private array $manager;
     private string $pageUniqueCode;
     private string $version;
+    private int $timeout;
 
     /**
      * @throws \Exception
      */
-    public function __construct(array $config, string $pageUniqueCode, string $version = 'v1')
+    public function __construct(
+        array  $config,
+        string $pageUniqueCode,
+        string $version = 'v1',
+        int    $timeout = 10
+    )
     {
         $this->setToken($config['token']);
         $this->setBaseUrl($config['baseUrl']);
         $this->setPageUniqueCode($pageUniqueCode);
         $this->setVersion($version);
+        $this->setTimeout($timeout);
     }
 
     public static function getBearerToken(): ?string
@@ -74,9 +81,10 @@ class MultiChat
         string $customerName,
         string $mangerEmail = '',
         string $mangerName = '',
-        string $version = 'v1'
+        string $version = 'v1',
+        int    $timeout = 10
     ): MultiChat {
-        $multiChat = new self($config, $pageUniqueCode, $version);
+        $multiChat = new self($config, $pageUniqueCode, $version, $timeout);
         if (!empty($customerEmail)) {
             $multiChat->setCustomer($customerEmail, $customerName);
         }
@@ -133,7 +141,6 @@ class MultiChat
      * @param  string  $email
      * @param  string  $name
      * @param  string  $type
-     * @param int      $timeout
      *
      * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -142,8 +149,7 @@ class MultiChat
     public function createChatReader(
         string $email,
         string $name,
-        string $type = 'BUYER',
-        int    $timeout = 10
+        string $type = 'BUYER'
     ): array
     {
         $client = new Client();
@@ -160,7 +166,7 @@ class MultiChat
                 'email'     => $email,
                 'type_name' => $type,
             ],
-            'timeout' => $timeout
+            'timeout' => $this->timeout
         ]);
         if ($response->getStatusCode() != 200) {
             throw new Exception("Bad response");
@@ -220,7 +226,7 @@ class MultiChat
             'headers' => [
                 'Authorization' => 'Bearer '.$this->getToken(),
             ],
-            'timeout' => 10,
+            'timeout' => $this->timeout,
         ]);
 
         if ($response->getStatusCode() != 200) {
@@ -260,7 +266,7 @@ class MultiChat
                 'Content-Type'  => 'application/json',
             ],
             'json'    => $data,
-            'timeout' => 10,
+            'timeout' => $this->timeout,
         ]);
 
         if ($response->getStatusCode() != 200) {
@@ -315,6 +321,11 @@ class MultiChat
     public function setVersion(string $version): void
     {
         $this->version = $version;
+    }
+
+    public function setTimeout(int $value): void
+    {
+        $this->timeout = $value;
     }
 
     /**
