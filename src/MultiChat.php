@@ -111,7 +111,7 @@ class MultiChat
 
         $response = $client->request(
             'POST',
-            $multiChat->getBaseUrl()."/api/{$multiChat->getVersion()}/chats/", [
+            $multiChat->getBaseUrl()."/api/{$multiChat->getVersion()}/managers/change-active-status", [
             'headers' => [
                 'Authorization' => 'Bearer ' . $multiChat->getToken(),
                 'Accept'        => 'application/json',
