@@ -98,6 +98,34 @@ class MultiChat
         return $multiChat;
     }
 
+    public static function updateManagersActiveStatus(
+        array  $config,
+        array  $data,
+        string $version = 'v1',
+        int    $timeout = 60
+    )
+    {
+        $multiChat = new self($config, '', $version, $timeout);
+
+        $client = new Client();
+
+        $response = $client->request(
+            'POST',
+            $multiChat->getBaseUrl()."/api/{$multiChat->getVersion()}/chats/", [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $multiChat->getToken(),
+                'Accept'        => 'application/json',
+                'Content-Type'  => 'application/json',
+            ],
+            'json'    => $data,
+            'timeout' => $timeout,
+        ]);
+
+        if ($response->getStatusCode() != 200) {
+            throw new Exception("Update manager active status bad response");
+        }
+    }
+
     public function getToken(): string
     {
         return $this->token;
