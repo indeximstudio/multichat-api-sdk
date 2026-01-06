@@ -334,7 +334,7 @@ class MultiChat
             $readerId = $this->customer['id'];
         }
         if (!empty($this->attachedToCustomerManager)) {
-            $attachedToCustomerManagerId = $this->manager['id'];
+            $attachedToCustomerManagerId = $this->attachedToCustomerManager['id'];
         }
 
         return rtrim(
