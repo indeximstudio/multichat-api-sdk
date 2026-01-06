@@ -12,6 +12,7 @@ class MultiChat
     private array $chat;
     private array $customer;
     private array $manager;
+    private array $attachedToCustomerManager;
     private string $pageUniqueCode;
     private string $version;
     private int $timeout;
@@ -81,6 +82,8 @@ class MultiChat
         string $customerName,
         string $mangerEmail = '',
         string $mangerName = '',
+        string $attachedToOrderMangerEmail = '',
+        string $attachedToOrderMangerName = '',
         string $version = 'v1',
         int    $timeout = 10
     ): MultiChat {
@@ -93,6 +96,9 @@ class MultiChat
         }
         if (!empty($mangerEmail)){
             $multiChat->setManager($mangerEmail, $mangerName);
+        }
+        if (!empty($attachedToOrderMangerEmail)){
+            $multiChat->setAttachedToCustomerManager($attachedToOrderMangerEmail, $attachedToOrderMangerName);
         }
 
         return $multiChat;
@@ -327,8 +333,19 @@ class MultiChat
         } else {
             $readerId = $this->customer['id'];
         }
+        if (!empty($this->attachedToCustomerManager)) {
+            $attachedToCustomerManagerId = $this->manager['id'];
+        }
 
-        return $url . '/' . $readerId;
+        return rtrim(
+            sprintf(
+                '%s/%s/%s',
+                $url,
+                $readerId,
+                $attachedToCustomerManagerId ?? ''
+            ),
+            '/'
+        );
     }
 
     public function getPageUniqueCode(): string
@@ -386,6 +403,21 @@ class MultiChat
         );
         if (empty($this->manager)) {
             $this->manager = $this->createChatReader(
+                $mangerEmail,
+                $mangerName,
+                'MANAGER'
+            );
+        }
+    }
+
+    private function setAttachedToCustomerManager(string $mangerEmail = '', string $mangerName = ''): void
+    {
+        $this->attachedToCustomerManager = $this->getChatReader(
+            $mangerEmail,
+            'MANAGER'
+        );
+        if (empty($this->attachedToCustomerManager)) {
+            $this->attachedToCustomerManager = $this->createChatReader(
                 $mangerEmail,
                 $mangerName,
                 'MANAGER'
