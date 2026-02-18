@@ -274,9 +274,6 @@ class MultiChat
             'headers' => [
                 'Authorization' => 'Bearer '.$this->getToken(),
             ],
-            'query' => [
-                'enable_components' => $this->config['enable_components'] ?? []
-            ],
             'timeout' => $this->timeout,
         ]);
 
@@ -315,9 +312,6 @@ class MultiChat
                 'Authorization' => 'Bearer '.$this->getToken(),
                 'Accept'        => 'application/json',
                 'Content-Type'  => 'application/json',
-            ],
-            'query' => [
-                'enable_components' => $this->config['enable_components'] ?? []
             ],
             'json'    => $data,
             'timeout' => $this->timeout,
@@ -359,10 +353,14 @@ class MultiChat
 
         return rtrim(
             sprintf(
-                '%s/%s/%s',
+                '%s/%s/%s?%s=%s',
                 $url,
                 $readerId,
-                $attachedToCustomerManagerId ?? ''
+                $attachedToCustomerManagerId ?? '',
+                'data',
+                json_encode([
+                    'enable_components' => $this->config['enable_components']
+                ])
             ),
             '/'
         );
