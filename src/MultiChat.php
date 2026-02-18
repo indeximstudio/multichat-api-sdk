@@ -9,6 +9,7 @@ class MultiChat
 {
     private string $token = '';
     private string $baseUrl = '';
+    private array $config;
     private array $chat;
     private array $customer;
     private array $manager;
@@ -27,6 +28,7 @@ class MultiChat
         int    $timeout = 10
     )
     {
+        $this->setConfig($config);
         $this->setToken($config['token']);
         $this->setBaseUrl($config['baseUrl']);
         $this->setPageUniqueCode($pageUniqueCode);
@@ -143,6 +145,14 @@ class MultiChat
      * @return void
      * @throws \Exception
      */
+    public function setConfig(array $config): void
+    {
+        if (empty($config)) {
+            throw new Exception("Empty config");
+        }
+        $this->config = $config;
+    }
+
     public function setToken(string $token): void
     {
         if (empty($token)) {
@@ -260,6 +270,9 @@ class MultiChat
             'headers' => [
                 'Authorization' => 'Bearer '.$this->getToken(),
             ],
+            'query' => [
+                'enable_components' => $this->config['enable_components'] ?? []
+            ],
             'timeout' => $this->timeout,
         ]);
 
@@ -298,6 +311,9 @@ class MultiChat
                 'Authorization' => 'Bearer '.$this->getToken(),
                 'Accept'        => 'application/json',
                 'Content-Type'  => 'application/json',
+            ],
+            'query' => [
+                'enable_components' => $this->config['enable_components'] ?? []
             ],
             'json'    => $data,
             'timeout' => $this->timeout,
