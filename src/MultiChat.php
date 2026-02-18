@@ -7,6 +7,10 @@ use GuzzleHttp\Client;
 
 class MultiChat
 {
+    public const COMPONENT_HEADER = 'header';
+    public const COMPONENT_ALL_ORDERS_CHATS_MESSAGE = 'all_orders_chats_message';
+    public const COMPONENT_SCHEDULE_MESSAGE = 'schedule_message';
+
     private string $token = '';
     private string $baseUrl = '';
     private array $config;
