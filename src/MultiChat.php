@@ -353,14 +353,13 @@ class MultiChat
 
         return rtrim(
             sprintf(
-                '%s/%s/%s?%s',
+                '%s/%s/%s?%s=%s',
                 $url,
                 $readerId,
                 $attachedToCustomerManagerId ?? '',
+                'data',
                 json_encode([
-                    'data' => [
-                        'enable_components' => $this->config['enable_components']
-                    ]
+                    'enable_components' => $this->config['enable_components']
                 ])
             ),
             '/'
