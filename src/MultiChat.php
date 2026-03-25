@@ -138,6 +138,41 @@ class MultiChat
         }
     }
 
+    public static function getCustomerUnseenMessages(
+        array  $config,
+        string $email,
+        string $version = 'v1',
+        int    $timeout = 60
+    ): array
+    {
+        $multiChat = new self($config, '', $version, $timeout);
+
+        $client = new Client();
+
+        $response = $client->request(
+            'GET',
+            $multiChat->getBaseUrl()."/api/{$multiChat->getVersion()}/customers/unseen-messages/".rawurlencode($email), [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $multiChat->getToken(),
+                'Accept'        => 'application/json',
+            ],
+            'timeout' => $timeout,
+        ]);
+
+        if ($response->getStatusCode() != 200) {
+            throw new Exception("Get customer unseen messages bad response");
+        }
+
+        $body = $response->getBody()->getContents();
+        $responseArray = json_decode($body, true);
+
+        if (($responseArray['success'] ?? false) === true) {
+            return $responseArray['data'] ?? [];
+        }
+
+        return [];
+    }
+
     public function getToken(): string
     {
         return $this->token;
