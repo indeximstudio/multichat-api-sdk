@@ -281,6 +281,9 @@ class MultiChat
                 'Authorization' => 'Bearer ' . $this->getToken(),
             ]
         ]);
+        if ($response->getStatusCode() == 404) {
+            return [];
+        }
         if ($response->getStatusCode() != 200) {
             throw new Exception("Bad response");
         }
@@ -311,7 +314,9 @@ class MultiChat
             ],
             'timeout' => $this->timeout,
         ]);
-
+        if ($response->getStatusCode() == 404) {
+            return [];
+        }
         if ($response->getStatusCode() != 200) {
             throw new Exception("checkChat bad response");
         }
