@@ -276,10 +276,11 @@ class MultiChat
         $client = new Client();
         $response = $client->request(
             'GET',
-            $this->getBaseUrl()."/api/{$this->getVersion()}/customers/email/$email/$type", [
+            $this->getBaseUrl()."/api/{$this->getVersion()}/customers/email/".rawurlencode($email)."/$type", [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->getToken(),
-            ]
+            ],
+            'http_errors' => false,
         ]);
         if ($response->getStatusCode() == 404) {
             return [];
@@ -308,10 +309,11 @@ class MultiChat
 
         $response = $client->request(
             'GET',
-            $this->getBaseUrl()."/api/{$this->getVersion()}/chats/page_unique_code/{$this->getPageUniqueCode()}", [
+            $this->getBaseUrl()."/api/{$this->getVersion()}/chats/page_unique_code/".rawurlencode($this->getPageUniqueCode()), [
             'headers' => [
                 'Authorization' => 'Bearer '.$this->getToken(),
             ],
+            'http_errors' => false,
             'timeout' => $this->timeout,
         ]);
         if ($response->getStatusCode() == 404) {
