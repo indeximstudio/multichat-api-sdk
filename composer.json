@@ -16,7 +16,7 @@
         "php": ">=8.3",
         "ext-mbstring": "*",
         "ext-json": "*",
-        "guzzlehttp/guzzle": "^8.0"
+        "guzzlehttp/guzzle": "^7.15.3"
     },
     "autoload": {
         "psr-4": {
